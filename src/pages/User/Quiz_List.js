@@ -1,51 +1,81 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { sampleQuizzes } from './quiz_list_sample_data'; // Import sample data
+import axios from 'axios'; // Import Axios
+import { useAuth } from "../../context/AuthContext";
+import { Navigate } from "react-router-dom";
 
 const QuizList = ({ isAdmin }) => {
   const [quizzes, setQuizzes] = useState([]);
+  const [loading, setLoading] = useState(true); // State for loading status
+  const [error, setError] = useState(null); // State for error handling
 
-  // Instead of fetching from the API, use the sample data for testing
+  // Fetch quizzes from the API using Axios
   useEffect(() => {
-    setQuizzes(sampleQuizzes);
+    const fetchQuizzes = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/quizzes/');
+        setQuizzes(response.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuizzes();
   }, []);
 
-  return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Available Quizzes</h1>
+  const { isAuthenticated, user, logout } = useAuth();
+  console.warn(user);
 
-      {/* Admin view: Option to manage and create quizzes */}
+  if (!isAuthenticated) {
+    // Redirect to home if not logged in
+    return <Navigate to="/" replace />;
+  }
+  if (loading) {
+    return <div className="text-center">Loading quizzes...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500">Error: {error}</div>;
+  }
+
+  return (
+    <div className="container mx-auto p-6 bg-gray-50">
+      <h1 className="text-3xl font-extrabold text-indigo-700 mb-8 text-center">Available Quizzes</h1>
+
       {isAdmin && (
-        <div className="mb-4">
-          <Link to="/admin/create" className="text-blue-500 hover:underline">
+        <div className="text-center mb-6">
+          <Link
+            to="/admin/create"
+            className="bg-indigo-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-indigo-700 transition duration-200"
+          >
             Create New Quiz
           </Link>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {quizzes.map((quiz) => (
           <div
             key={quiz.id}
-            className="bg-white border border-gray-200 rounded-lg p-4 shadow-md"
+            className="bg-white border border-indigo-200 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300"
           >
-            <h2 className="text-xl font-semibold">{quiz.title}</h2>
-            <p className="text-gray-600">{quiz.description}</p>
-            <div className="flex justify-between items-center mt-4">
-              <span className="text-sm text-gray-500">
-                {quiz.questionsCount} questions
-              </span>
-              <span className="text-sm text-gray-500">
-                Time Limit: {quiz.timeLimit} min
-              </span>
+            <h2 className="text-2xl font-semibold text-gray-800">{quiz.title}</h2>
+            <p className="text-gray-500 mt-2">{quiz.description}</p>
+            <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
+              <span>{quiz.questions_count} questions</span>
+              <span>Time Limit: {quiz.time_limit} min</span>
+            </div>
+            <div className="mt-2 text-sm text-gray-500">
+              Created by: <span className="font-medium text-gray-700">{quiz.created_by}</span>
             </div>
 
-            {/* View Details or Manage Quiz */}
             {isAdmin ? (
               <div className="mt-4">
                 <Link
                   to={`/admin/quizzes/${quiz.id}`}
-                  className="text-blue-500 hover:underline"
+                  className="text-indigo-600 hover:text-indigo-800 font-medium"
                 >
                   Manage Quiz
                 </Link>
@@ -54,7 +84,7 @@ const QuizList = ({ isAdmin }) => {
               <div className="mt-4">
                 <Link
                   to={`/quiz/${quiz.id}`}
-                  className="text-blue-500 hover:underline"
+                  className="text-indigo-600 hover:text-indigo-800 font-medium"
                 >
                   Take Quiz
                 </Link>
@@ -68,3 +98,4 @@ const QuizList = ({ isAdmin }) => {
 };
 
 export default QuizList;
+

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
   const { login } = useAuth();
@@ -11,7 +12,7 @@ const Login = () => {
   const [role, setRole] = useState(""); // Role state (admin/user)
   const [error, setError] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     // Validate input fields
@@ -24,21 +25,30 @@ const Login = () => {
       return;
     }
 
-    // Mock user data (Replace with API call)
-    const userData = {
-      email,
-      name: "John Doe",
-      role, // Admin or User based on selection
-    };
+    try {
+      // Make API call
+      const response = await axios.post("http://localhost:5000/api/users/login", {
+        email,
+        password,
+        role,
+      });
 
-    login(userData); // Update context
-    console.log(userData);
-    
-    // navigate("/"); // Redirect to Home or Dashboard
-    if (userData.role === "admin") {
-      navigate("/admin/dashboard");
-    } else {
-      navigate("/user/dashboard");
+      // Extract user data from the response
+      const userData = response.data.user;
+
+      // Update context
+      login(userData);
+
+      // Navigate to the appropriate dashboard
+      if (userData.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/user/dashboard");
+      }
+    } catch (err) {
+      // Handle errors (e.g., invalid credentials)
+      const errorMessage = err.response?.data?.message || "An error occurred during login.";
+      setError(errorMessage);
     }
   };
 

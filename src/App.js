@@ -17,6 +17,7 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import { AuthProvider } from "./context/AuthContext";
 import { useAuth } from "./context/AuthContext";
 import Leaderboard from './pages/Leaderboard';
+import EditQuiz from './pages/Admin/Edit';
 
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
             <Route path="/admin/quizzes" element={<Quiz_Mange />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/admin/edit/:id" element={<EditQuiz />} />
 
 
           </Routes>

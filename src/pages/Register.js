@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState } from "react";
 
 const Registration = () => {
@@ -6,6 +7,7 @@ const Registration = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "", // Add role to form data
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -16,9 +18,9 @@ const Registration = () => {
   };
 
   const validateForm = () => {
-    const { name, email, password, confirmPassword } = formData;
+    const { name, email, password, confirmPassword, role } = formData;
 
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword || !role) {
       return "All fields are required.";
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -34,6 +36,22 @@ const Registration = () => {
     return null;
   };
 
+  const sendRegisterData = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/users/register", formData);
+      setSuccess("Registration successful!"); // Display success message
+      setError(""); // Clear any previous errors
+      console.log("Response from API:", response.data);
+    } catch (error) {
+      // Handle error response from backend
+      const errorMessage = error.response?.data?.error || "An error occurred during registration.";
+      setError(errorMessage); // Display error message from backend
+      setSuccess(""); // Clear success message
+      console.error("Error during registration:", errorMessage);
+    }
+  };
+  
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -44,17 +62,20 @@ const Registration = () => {
       return;
     }
 
-    // Simulate form submission (Replace this with your API call)
     setError("");
-    setSuccess("Registration successful!");
-    console.log("Registered Data:", formData);
+    setSuccess("");
+    console.log("Form data to submit:", formData);
 
-    // Reset form
+    // Call function to send data to the API
+    sendRegisterData();
+
+    // Reset form after submission
     setFormData({
       name: "",
       email: "",
       password: "",
       confirmPassword: "",
+      role: "",
     });
   };
 
@@ -62,6 +83,7 @@ const Registration = () => {
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Register</h1>
 
+      {/* Display Error or Success Messages */}
       {error && <div className="text-red-500 mb-4">{error}</div>}
       {success && <div className="text-green-500 mb-4">{success}</div>}
 
@@ -109,6 +131,19 @@ const Registration = () => {
             className="w-full p-2 border border-gray-300 rounded-lg"
             placeholder="Confirm your password"
           />
+        </div>
+        <div>
+          <label className="block font-medium mb-2">Role</label>
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded-lg"
+          >
+            <option value="">--Select Role--</option>
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+          </select>
         </div>
         <button
           type="submit"

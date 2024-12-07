@@ -1,42 +1,40 @@
 // src/quiz_details_sample_data.js
 export const quizDetails = {
-    id: "1",
-    title: "General Knowledge Quiz",
-    description: "Test your general knowledge skills with this fun quiz!",
-    questions: [
-      {
-        id: "q1",
-        questionText: "What is the capital of France?",
-        type: "multiple-choice",
-        options: ["Berlin", "Madrid", "Paris", "Lisbon"],
-        correctAnswer: "Paris"
-      },
-      {
-        id: "q1",
-        questionText: "What is the capital of France?",
-        type: "multiple-choice",
-        options: ["Berlin", "Madrid", "Paris", "Lisbon"],
-        correctAnswer: "Paris"
-      },
-      {
-        id: "q1",
-        questionText: "What is the capital of France?",
-        type: "multiple-choice",
-        options: ["Berlin", "Madrid", "Paris", "Lisbon"],
-        correctAnswer: "Paris"
-      },
-      {
-        id: "q2",
-        questionText: "True or False: The Earth is flat.",
-        type: "true-false",
-        correctAnswer: "False"
-      },
-      {
-        id: "q3",
-        questionText: "Fill in the blank: The tallest mountain in the world is _____.",
-        type: "fill-in-the-blank",
-        correctAnswer: "Mount Everest"
-      }
-    ]
-  };
-  
+  id: "1",
+  title: "Challenging General Knowledge Quiz",
+  description: "Test your advanced general knowledge with these challenging questions!",
+  questions: [
+    {
+      id: "q1",
+      questionText: "Which element has the chemical symbol 'Hg'?",
+      type: "multiple-choice",
+      options: ["Hydrogen", "Mercury", "Helium", "Magnesium"],
+      correctAnswer: "Mercury"
+    },
+    {
+      id: "q2",
+      questionText: "The Great Wall of China was primarily built to protect against which group?",
+      type: "multiple-choice",
+      options: ["The Mongols", "The Romans", "The British", "The French"],
+      correctAnswer: "The Mongols"
+    },
+    {
+      id: "q3",
+      questionText: "True or False: The Eiffel Tower was originally intended to be a temporary structure.",
+      type: "true-false",
+      correctAnswer: "True"
+    },
+    {
+      id: "q4",
+      questionText: "Fill in the blank: The longest river in Asia is the _____ River.",
+      type: "fill-in-the-blank",
+      correctAnswer: "Yangtze"
+    },
+    {
+      id: "q5",
+      questionText: "True or False: Mount Everest is located in the Himalayas.",
+      type: "true-false",
+      correctAnswer: "True"
+    }
+  ]
+};

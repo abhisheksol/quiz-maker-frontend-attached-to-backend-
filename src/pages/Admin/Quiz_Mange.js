@@ -1,47 +1,84 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { Navigate } from "react-router-dom";
-const mockQuizzes = [
-    {
-        id: 1,
-        title: "JavaScript Basics",
-        description: "A quiz about JavaScript fundamentals.",
-        questionsCount: 10,
-    },
-    {
-        id: 2,
-        title: "React Overview",
-        description: "Test your React knowledge.",
-        questionsCount: 8,
-    },
-    {
-        id: 3,
-        title: "Node.js Essentials",
-        description: "A quiz on Node.js basics.",
-        questionsCount: 12,
-    },
-];
+import { Navigate, useNavigate } from "react-router-dom";
+
+// Commented out mock data since you are using API now
+// const mockQuizzes = [
+//     {
+//         id: 1,
+//         title: "JavaScript Basics",
+//         description: "A quiz about JavaScript fundamentals.",
+//         questionsCount: 10,
+//     },
+//     {
+//         id: 2,
+//         title: "React Overview",
+//         description: "Test your React knowledge.",
+//         questionsCount: 8,
+//     },
+//     {
+//         id: 3,
+//         title: "Node.js Essentials",
+//         description: "A quiz on Node.js basics.",
+//         questionsCount: 12,
+//     },
+// ];
 
 const ManageQuizzes = () => {
-    const [quizzes, setQuizzes] = useState(mockQuizzes);
+    const [quizzes, setQuizzes] = useState([]);
     const { isAuthenticated, user, logout } = useAuth();
-    console.log("this is ", isAuthenticated);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // Fetch quizzes from API
+        const fetchQuizzes = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/api/quizzes"); // Replace with your actual API URL
+                const data = await response.json();
+
+                // Filter quizzes based on the logged-in user's role and name
+                const filteredQuizzes = data.filter(
+                    (quiz) => quiz.created_by === user.name
+                );
+
+                setQuizzes(filteredQuizzes);
+            } catch (error) {
+                console.error("Error fetching quizzes:", error);
+            }
+        };
+
+        if (isAuthenticated) {
+            fetchQuizzes();
+        }
+    }, [isAuthenticated, user.name]);
 
     if (!isAuthenticated) {
         // Redirect to home if not logged in
         return <Navigate to="/" replace />;
     }
+
     // Handle quiz deletion
-    const handleDelete = (id) => {
-        const updatedQuizzes = quizzes.filter((quiz) => quiz.id !== id);
-        setQuizzes(updatedQuizzes);
-        console.log(`Quiz with ID ${id} deleted`);
+    const handleDelete = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/quizzes/${id}`, {
+                method: "DELETE",
+            });
+
+            if (response.ok) {
+                const updatedQuizzes = quizzes.filter((quiz) => quiz.id !== id);
+                setQuizzes(updatedQuizzes);
+                console.log(`Quiz with ID ${id} deleted`);
+            } else {
+                console.error("Failed to delete the quiz");
+            }
+        } catch (error) {
+            console.error("Error deleting quiz:", error);
+        }
     };
 
-    // Handle quiz editing (For now, log the ID; expand as needed)
+    // Handle quiz editing
     const handleEdit = (id) => {
-        console.log(`Editing quiz with ID ${id}`);
-        // Implement edit logic later (e.g., navigate to an edit page or open a modal)
+        navigate(`/admin/edit/${id}`);
     };
 
     return (
@@ -65,7 +102,7 @@ const ManageQuizzes = () => {
                                 <td className="border border-gray-300 p-2">{quiz.title}</td>
                                 <td className="border border-gray-300 p-2">{quiz.description}</td>
                                 <td className="border border-gray-300 p-2 text-center">
-                                    {quiz.questionsCount}
+                                    {quiz.questions_count}
                                 </td>
                                 <td className="border border-gray-300 p-2 text-center">
                                     <button
@@ -93,3 +130,4 @@ const ManageQuizzes = () => {
 };
 
 export default ManageQuizzes;
+

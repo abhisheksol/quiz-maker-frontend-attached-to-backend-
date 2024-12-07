@@ -1,52 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from '../../services/api';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 
 const UserQuizResult = () => {
-  const { userId } = useParams();
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const mockResults: QuizResult[] = [
-    {
-      quizId: '1',
-      quizTitle: 'General Knowledge Quiz',
-      score: 8,
-      totalQuestions: 10,
-      dateTaken: '2024-11-20T14:30:00Z',
-    },
-    {
-      quizId: '2',
-      quizTitle: 'JavaScript Basics',
-      score: 5,
-      totalQuestions: 5,
-      dateTaken: '2024-11-21T10:00:00Z',
-    },
-  ];
-  
-  useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setResults(mockResults);
-      setLoading(false);
-    }, 1000);
-  }, []);
-  
-//   useEffect(() => {
-//     const fetchResults = async () => {
-//       try {
-//         setLoading(true);
-//         const response = await axios.get(`/api/users/${userId}/results`);
-//         setResults(response.data);
-//       } catch (err) {
-//         setError('Failed to fetch quiz results. Please try again.');
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
+  const { isAuthenticated, user } = useAuth(); // Get user from context
 
-//     fetchResults();
-//   }, [userId]);
+  useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get("http://localhost:5000/api/users/results");
+        // Filter results to include only those matching the user ID from context
+        const filteredResults = response.data.filter((result) => result.user_id === user.id);
+        setResults(filteredResults);
+      } catch (err) {
+        setError("Failed to fetch quiz results. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isAuthenticated && user) {
+      fetchResults();
+    } else {
+      setError("You need to be logged in to view quiz results.");
+      setLoading(false);
+    }
+  }, [isAuthenticated, user]);
 
   if (loading)
     return (
@@ -77,19 +60,19 @@ const UserQuizResult = () => {
           </thead>
           <tbody>
             {results.map((result) => (
-              <tr key={result.quizId} className="hover:bg-gray-100">
-                <td className="border border-gray-300 px-4 py-2">{result.quizTitle}</td>
+              <tr key={result.quiz_id} className="hover:bg-gray-100">
+                <td className="border border-gray-300 px-4 py-2">{result.quiz_title}</td>
                 <td className="border border-gray-300 px-4 py-2">{result.score}</td>
-                <td className="border border-gray-300 px-4 py-2">{result.totalQuestions}</td>
+                <td className="border border-gray-300 px-4 py-2">{result.total_questions}</td>
                 <td className="border border-gray-300 px-4 py-2">
-                  {new Date(result.dateTaken).toLocaleString()}
+                  {new Date(result.date_taken).toLocaleString()}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       ) : (
-        <p className="text-gray-500">No quiz results available.</p>
+        <p className="text-gray-500">No quiz results available for this user.</p>
       )}
     </div>
   );
