@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import { useAuth } from "../../context/AuthContext";
+import { Navigate } from "react-router-dom";
 const EditQuiz = () => {
+
+   
     const [quiz, setQuiz] = useState({
         title: '',
         description: '',
@@ -27,6 +30,13 @@ const EditQuiz = () => {
 
         fetchQuiz();
     }, [id]);
+
+    const { isAuthenticated, user, logout } = useAuth();
+    if (!isAuthenticated) {
+  // Redirect to home if not logged in
+  return <Navigate to="/" replace />;
+}
+
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;

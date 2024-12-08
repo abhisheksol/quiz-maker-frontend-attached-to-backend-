@@ -15,6 +15,8 @@ const QuizList = ({ isAdmin }) => {
       try {
         const response = await axios.get('http://localhost:5000/api/quizzes/');
         setQuizzes(response.data);
+        console.log(response.data);
+        
       } catch (err) {
         setError(err.message);
       } finally {
@@ -84,6 +86,7 @@ const QuizList = ({ isAdmin }) => {
               <div className="mt-4">
                 <Link
                   to={`/quiz/${quiz.id}`}
+                  state={{ timer: quiz.time_limit }} // Pass the timer as state
                   className="text-indigo-600 hover:text-indigo-800 font-medium"
                 >
                   Take Quiz

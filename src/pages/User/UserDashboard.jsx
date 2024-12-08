@@ -44,7 +44,8 @@ const UserDashboard = () => {
           </Link>
 
           <Link
-            to="/logout"
+            to="/"
+            onClick={logout}
             className="block p-6 bg-red-500 text-white font-medium text-lg rounded-lg shadow-md hover:bg-red-600 transition"
           >
             Logout
